@@ -1,9 +1,20 @@
 # rubocop:disable Style/GlobalVars
 
+require "rbconfig"
+
+if RbConfig::MAKEFILE_CONFIG["CFLAGS"].include?("-g -O2")
+  fixed_CFLAGS = RbConfig::MAKEFILE_CONFIG["CFLAGS"].sub("-g -O2", "$(cflags)")
+  puts("Fix CFLAGS: #{RbConfig::MAKEFILE_CONFIG["CFLAGS"]} -> #{fixed_CFLAGS}")
+  RbConfig::MAKEFILE_CONFIG["CFLAGS"] = fixed_CFLAGS
+end
+
 require 'digest'
 require 'mkmf'
 require 'open-uri'
 require 'pathname'
+
+CONFIG["optflags"] = "-O0"
+CONFIG["debugflags"] = "-ggdb3"
 
 $objs = Dir.glob(File.join(__dir__, '*.c')).map { |f| Pathname.new(f).sub_ext('.o').to_s }
 
